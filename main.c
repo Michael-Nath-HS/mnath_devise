@@ -37,36 +37,47 @@ int main()
     int iters = 10;
     int my_numbers[iters];
     int result;
-    printf("[ ");
+    printf("Generating random numbers:\n");
     for (i = 0; i < iters; i++)
     {
         // generate a random number and add it to the array
         my_numbers[i] = generate_random_number();
-        printf("%d ", my_numbers[i]);
+        printf("\tRandom %d: %d\n", i, my_numbers[i]);
     }
-    printf("]\n");
     // open an output file, and write the contents of your array there.
-    out = open("./out.out", O_RDWR);
+    out = open("./out.out", O_CREAT | O_WRONLY, 0664);
     if (out == -1)
     {
         printf("Open Error %d: Message: %s\n", errno, strerror(errno));
         return 1;
     }
+    printf("Writing numbers to file...\n\n");
     result = write(out, my_numbers, sizeof(my_numbers));
     if (result == -1)
     {
         printf("Write Error %d: Message: %s\n", errno, strerror(errno));
         return 1;
     }
+    close(out);
+    out = open("./out.out", O_RDONLY);
+    if (out == -1)
+    {
+        printf("Open Error %d: Message: %s\n", errno, strerror(errno));
+        return 1;
+    }
     int same_random_numbers[iters];
     // read in the same numbers, but into a different array (tests usage of read/write functions)
     read(out, same_random_numbers, sizeof(same_random_numbers));
+    if (out == -1)
+    {
+        printf("Read Error %d: Message: %s\n", errno, strerror(errno));
+    }
+    printf("Reading numbers from file...\n\n");
     // determine equality ( in content ) of both arrays
-    printf("[ ");
+    printf("Verification that written values were the same:\n");
     for (i = 0; i < iters; i++)
     {
-        printf("%d ", my_numbers[i]);
+        printf("\tRandom %d: %d\n", i, my_numbers[i]);
     }
-    printf("]\n");
     close(out);
 }
